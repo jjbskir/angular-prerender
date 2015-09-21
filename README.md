@@ -70,8 +70,8 @@ $ node angular-prerender/prerender
 ## Run example
 - How to run the example from scratch
 ```
-$ mkdir angulat-test
-$ cd angulat-test
+$ mkdir prerender-test
+$ cd prerender-test
 $ git clone https://github.com/jjbskir/angular-prerender
 $ cd angular-prerender/
 $ npm install
