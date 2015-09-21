@@ -1,7 +1,7 @@
 # angular-prerender
 
 ## About: 
-Prerender your angular project to improve SEO and make pretty links.
+Prerender your angular project to improve SEO and make pretty links. 
 
 ## Install: 
 - Fork repository
@@ -60,7 +60,7 @@ Prerender your angular project to improve SEO and make pretty links.
 ## Prerender pages
 - Run from the directory with prerender-config.json
 ```
-$ node prerender/prerender
+$ node angular-prerender/prerender
 ```
 
 ## Improvments

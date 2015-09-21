@@ -1,11 +1,18 @@
 var fs = require('fs'),
 	_ = require('underscore');
 
+// prerender angular routes
+// ** to run
+// node angular-prerender/prerender
+
 String.prototype.includes = function(str) {
 	return (this.indexOf(str) > -1);
 }
 
+// config file to load that the user creates.
 var configFile = 'prerender-config.json';
+// front end portion to deal with routing.
+var angularPrerenderRoutesFile = 'angular-prerender/angular-prerender-routes.js';
 var config = {};
 var template = '';
 var routes = [];
@@ -27,7 +34,7 @@ function init() {
 		routes = config.routes || [];
 		template = config.template || '';
 		// update template. 
-		updateTemplate(template, function() {
+		updateTemplate(template, routes, function() {
 			// create routes. 
 			_.each(routes, function(route) {
 				console.log('prerendering: ' + route.name);
@@ -70,8 +77,12 @@ function validateConfig(config) {
 }
 
 // update the template file with the config variables. 
-function updateTemplate(template, cb) {
+function updateTemplate(template, routes, cb) {
 	var prerenderedHTML = '';
+	var scripts = false;
+	var prerenderScriptMarker = '';
+	var styles = false;
+	var prerenderStyleMarker = '';
 
 	var rl = require('readline').createInterface({
 		input: fs.createReadStream(template)
@@ -79,13 +90,33 @@ function updateTemplate(template, cb) {
 
 	rl.on('line', function (line) {
 		var newLine = '';
-		if (line.includes("prerender-scripts-end")) {
-			newLine = addConfig() + '\n' + line;
-		} else if (!line.includes("window.prerenderConfig")) {
+		if (line.includes("prerender-scripts") && !line.includes("prerender-scripts-end")) {
+			prerenderScriptMarker = line;
+			scripts = true;
+		} else if (line.includes("prerender-scripts-end")) {
+			scripts = false;
+			newLine += prerenderScriptMarker + '\n' + addScript(angularPrerenderRoutesFile) + '\n';
+			_.each(routes, function(route) {
+				newLine += addRouteScripts(route.scripts);
+			})
+			newLine += addConfig() + '\n' + line;
+		} else if (line.includes("prerender-style") && !line.includes("prerender-style-end")) {
+			prerenderStyleMarker = line;
+			styles = true;
+		} else if (line.includes("prerender-style-end")) {
+			styles = false;
+			newLine += prerenderStyleMarker + '\n';
+			_.each(routes, function(route) {
+				newLine += addRouteStyles(route.styles);
+			})
+			newLine += line;
+		} else {
 			newLine = line;
 		}
 		if (newLine && newLine !== '') {
-			prerenderedHTML += newLine + '\n';
+			if (!scripts && !styles) {
+				prerenderedHTML += newLine + '\n';
+			}
 		}
 	});
 
@@ -103,7 +134,9 @@ function readFile(route, routes, template) {
 
 	var prerenderedHTML = '';
 	var scripts = false;
+	var prerenderScriptMarker = '';
 	var styles = false;
+	var prerenderStyleMarker = '';
 
 	var rl = require('readline').createInterface({
 		input: fs.createReadStream(template)
@@ -114,14 +147,22 @@ function readFile(route, routes, template) {
 		// console.log(line);
 		var newLine = '';
 		if (line.includes("prerender-scripts") && !line.includes("prerender-scripts-end")) {
+			prerenderScriptMarker = line;
 			scripts = true;
 		} else if (line.includes("prerender-scripts-end")) {
-			newLine = addConfig();
+			// newLine = addConfig();
 			scripts = false;
+			newLine += prerenderScriptMarker + '\n' + addScript(angularPrerenderRoutesFile) + '\n';
+			newLine += addRouteScripts(route.scripts);
+			newLine += addConfig() + '\n' + line;
 		} else if (line.includes("prerender-style") && !line.includes("prerender-style-end")) {
+			prerenderStyleMarker = line;
 			styles = true;
 		} else if (line.includes("prerender-style-end")) {
 			styles = false;
+			newLine += prerenderStyleMarker + '\n';
+			newLine += addRouteStyles(route.styles);
+			newLine += line;
 		} else if (line.includes('name="description"') || line.includes("name='description'")) {
 			// change the description of the page.
 			// <meta name="description" content="Project">
@@ -135,18 +176,25 @@ function readFile(route, routes, template) {
 			// <title>Project</title>
 			newLine = (route.title) ? '\t\t<title>' + route.title + '</title>' : line;
 		} else {
-			if (scripts) {
-				newLine = addAsset("src=", line, route);
-			} else if (styles) {
-				// in the middle of processing styles.
-				newLine = addAsset("href=", line, route);
-			} else {
-				// just a normal line.
-				newLine = line;
-			}
+			newLine = line;
+			// if (scripts) {
+			// 	newLine = addAsset("src=", line, route);
+			// } else if (styles) {
+			// 	console.log('updating style');
+			// 	// in the middle of processing styles.
+			// 	newLine = addAsset("href=", line, route);
+			// 	console.log(newLine);
+			// } else {
+			// 	// just a normal line.
+			// 	newLine = line;
+			// }
 		}
 		if (newLine && newLine !== '') {
-			prerenderedHTML += newLine + '\n';
+			if (newLine && newLine !== '') {
+				if (!scripts && !styles) {
+					prerenderedHTML += newLine + '\n';
+				}
+			}
 		}
 
 	});
@@ -177,8 +225,42 @@ function readFile(route, routes, template) {
 
 }
 
+// Add config variable to the page.
+// return: Html to add to the page. <script type="text/javascript">window.prerenderConfig={}</script>
 function addConfig() {
-	return '\t\t<script type="text/javascript"> window.prerenderConfig = ' + JSON.stringify(config) + '</script>';
+	return '\t\t<script type="text/javascript">window.prerenderConfig=' + JSON.stringify(config) + '</script>';
+}
+
+// Add a script to the page.
+// script: Script path. app/js/test.js
+// return: Html to add to the page. <script type="text/javascript" src="app/js/test.js"></script>
+function addScript(script) {
+	return '\t\t<script type="text/javascript" src="' + script + '"></script>';
+}
+
+// add all of the scripts for a route.
+function addRouteScripts(scripts) {
+	var line = '';
+	_.each(scripts, function(script) {
+		line += addScript(script) + '\n';
+	});
+	return line;
+}
+
+// Add a style to the page.
+// style: Style path. app/css/test.css
+// return: Html to add to the page. <link rel="stylesheet" type="text/css" href="app/css/test.css"/>
+function addStyle(style) {
+	return '\t\t<link rel="stylesheet" type="text/css" href="' + style + '"/>';
+}
+
+// add all of the scripts for a route.
+function addRouteStyles(styles) {
+	var line = '';
+	_.each(styles, function(style) {
+		line += addStyle(style) + '\n';
+	});
+	return line;
 }
 
 function writeRenderer(routeName, prerenderedHTML, cb) {
