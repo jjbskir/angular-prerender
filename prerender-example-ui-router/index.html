@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible"  content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description"            content="Angular Prerender Example">
+    <meta name="author"                 content="jjbskir">
+    <title>Angular Prerender Example</title>
+    <!-- prerender-styles -->
+    <!-- prerender-style-end -->
+   
+  </head>
+  <body>
+    <div id="navigator" ui-view></div>
+    <script src="bower_components/lodash/lodash.min.js"></script>
+    <script type="text/javascript"  src="bower_components/angular/angular.min.js"></script>
+    <script type="text/javascript"  src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script type="text/javascript"  src="app.js"></script>
+    <!-- prerender-scripts -->
+		<script type="text/javascript" src="angular-prerender/angular-prerender-routes.js"></script>
+		<script type="text/javascript" src="controllers/home.js"></script>
+		<script type="text/javascript" src="controllers/about.js"></script>
+		<script type="text/javascript">window.prerenderConfig={"template":"index.html","templateView":"views/home.html","templateController":"HomeCtrl","routes":[{"name":"index","title":"Index","descritpion":"Home","controller":"HomeCtrl","view":"views/home.html","scripts":["controllers/home.js"],"styles":[]},{"name":"about","title":"About","descritpion":"About","controller":"AboutCtrl","view":"views/about.html","scripts":["controllers/about.js"],"styles":[]}]}</script>
+    <!-- prerender-scripts-end -->
+    <script type="text/javascript">
+        // manual bootstrap
+        angular.element(document).ready(function() {
+          angular.bootstrap(document, ['app']);
+        });
+    </script>
+  </body>
+</html>

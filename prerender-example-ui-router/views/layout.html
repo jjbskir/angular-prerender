@@ -1,0 +1,29 @@
+<h3>Angular Prerender Example</h3>
+<h3>Using <a href="https://github.com/angular-ui/ui-router" target="_blank">angular-ui ui-router</a></h3>
+
+<header class="header">
+  <div class="container" ng-show="isHashRoute">
+  	With Hash Tags
+  	<p><a href="#/index">Index</a></p>
+    <p><a href="#/about">About</a></p>
+    <p><a href="index">Switch to no hashtags</a></p>
+  </div>
+  <div class="container" ng-hide="isHashRoute">
+  	No Hash Tags
+  	<p><a href="index#/">Index</a></p>
+    <p><a href="about#/">About</a></p>
+    <p><a href="./">Switch to hashtags</a></p>
+  </div>
+</header>
+
+<!-- Begin page content -->
+<div class="container">
+  <section id="app-layout" class="index" ui-view="detail"></section>
+</div>
+
+<br>
+<footer class="footer">
+  <div class="container">
+    <a href="https://github.com/jjbskir/angular-prerender" target="_block">Check out the project</a>
+  </div>
+</footer>
