@@ -63,6 +63,17 @@ $ npm install
 <!-- prerender-styles -->
 <!-- prerender-style-end -->
 ```
+- In your app.js file or where ever you intialize your app add the library angularPrerenderRoutes.
+```
+angular.module('app', [
+    'angularPrerenderRoutes'
+])
+```
+- If using $stateProvider, pass it into the angularPrerenderProvider in configuration
+```
+angularPrerenderProvider.createRoutes({$stateProvider: $stateProvider});
+$urlRouterProvider.otherwise('/');
+```
 
 ## Prerender pages
 - Run from the directory with prerender-config.json
@@ -70,8 +81,8 @@ $ npm install
 $ node angular-prerender/prerender
 ```
 
-## Run example
-- How to run the example from scratch
+## Run example 
+- How to run the example from scratch for Mac
 ```
 $ mkdir prerender-test
 $ cd prerender-test

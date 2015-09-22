@@ -19,7 +19,8 @@ angular.module('app', [
     })
 
     angularPrerenderProvider.createRoutes({$stateProvider: $stateProvider});
-
+    // this is required for the root url to direct to /#/
+    $urlRouterProvider.otherwise('/');
 }])
 .controller('MasterController', ['$rootScope', '$location', '$scope', '$state', 'angularPrerender', function($rootScope, $location, $scope , $state, angularPrerender) {
 
