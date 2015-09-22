@@ -1,30 +1,25 @@
 angular.module('app', [
     // libraries
-    'ui.router', 
+    'ngRoute',
     'angularPrerenderRoutes'
 ])
-.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 'angularPrerenderProvider', function($stateProvider, $urlRouterProvider, $locationProvider, angularPrerenderProvider) {
+.config(['$routeProvider', '$locationProvider', 'angularPrerenderProvider', function($routeProvider, $locationProvider, angularPrerenderProvider) {
 
-    // provide a wrapper controller and view that is gloabl.
-    $stateProvider
-    .state('view', {
-        abstract: true,
-        url: '',
-        views: {
-            '@': {
-                templateUrl: 'views/layout.html',
-                controller: 'MasterController'
-            }
-        }
-    })
-
-    angularPrerenderProvider.createRoutes({$stateProvider: $stateProvider});
-    // this is required for the root url to direct to /#/
-    $urlRouterProvider.otherwise('/');
-}])
-.controller('MasterController', ['$rootScope', '$location', '$scope', '$state', 'angularPrerender', function($rootScope, $location, $scope , $state, angularPrerender) {
-
-    $scope.isHashRoute = angularPrerender.isHashRoute();
-    console.log('using hash routes: ' + $scope.isHashRoute);
-
+    // add in the route templates.
+    angularPrerenderProvider.setRouteTemplate(function(params, route) {
+        params.$routeProvider
+        .when('/' + route.name, {
+            templateUrl: route.view,
+            controller: route.controller
+        });
+    });
+    angularPrerenderProvider.setRouteTemplateSingle(function(params, route) {
+        params.$routeProvider
+        .when('/', {
+            templateUrl: route.view,
+            controller: route.controller
+        });
+    });
+    // add the routes.
+    angularPrerenderProvider.createRoutes({$routeProvider: $routeProvider});
 }]);

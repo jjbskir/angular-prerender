@@ -63,17 +63,66 @@ $ npm install
 <!-- prerender-styles -->
 <!-- prerender-style-end -->
 ```
-- In your app.js file or where ever you intialize your app add the library angularPrerenderRoutes.
+- In your app.js file or where ever you intialize your app add the library angularPrerenderRoutes and your route library of choice.
 ```
 angular.module('app', [
+	'ngRoute'
     'angularPrerenderRoutes'
 ])
 ```
-- If using $stateProvider, pass it into the angularPrerenderProvider in configuration
+- If using angular-ui/ui-router, pass it into the angularPrerenderProvider in configuration
 ```
+// add the route templates
+angularPrerenderProvider.setRouteTemplate(function(params, route) {
+    params.$stateProvider
+    .state('view.' + route.name, {
+        url: '/' + route.name,
+        views: {
+          'detail@view' : {
+            templateUrl: route.view,
+            controller: route.controller
+          }
+        }
+    })
+});
+angularPrerenderProvider.setRouteTemplateSingle(function(params, route) {
+    params.$stateProvider
+    .state('view.home', {
+        url: '/',
+        views: {
+            'detail@view' : {
+                templateUrl: route.view,
+                controller: route.controller
+            }
+        }
+    })
+});
+// add the routes.
 angularPrerenderProvider.createRoutes({$stateProvider: $stateProvider});
+// this is required for the root url to direct to /#/
 $urlRouterProvider.otherwise('/');
 ```
+- If using angular/router, pass it into the angularPrerenderProvider in configuration
+```
+// add in the route templates.
+angularPrerenderProvider.setRouteTemplate(function(params, route) {
+    params.$routeProvider
+    .when('/' + route.name, {
+        templateUrl: route.view,
+        controller: route.controller
+    });
+});
+angularPrerenderProvider.setRouteTemplateSingle(function(params, route) {
+    params.$routeProvider
+    .when('/', {
+        templateUrl: route.view,
+        controller: route.controller
+    });
+});
+// add the routes.
+angularPrerenderProvider.createRoutes({$routeProvider: $routeProvider});
+```
+
 
 ## Prerender pages
 - Run from the directory with prerender-config.json
@@ -96,11 +145,9 @@ $ cd prerender-example
 $ bower install
 $ node angular-prerender/prerender 
 ```
-- view at to/directory/prerender-test/prerender-example/#/
+- view at http://directory/prerender-test/prerender-example/#/
 
 ## Improvments
 - Make it work for nested directories
 - Make it work for url parameters.
-- Let the coder be able to decide what route template to use in agnular-prerender-routes.js
-- explain url href issue in menu.js and work arrounds.
 - for each route file it creates, only need to add the route info for that route.

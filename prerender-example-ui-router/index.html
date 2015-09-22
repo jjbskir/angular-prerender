@@ -12,21 +12,10 @@
    
   </head>
   <body>
-    <h3>Angular Prerender Example</h3>
-    <h3>Using <a href="https://github.com/angular/router" target="_blank">angular router</a></h3>
-    <!-- Begin page content -->
-    <div class="container">
-      <section id="app-layout" class="index" ng-view></section>
-    </div>
-    <br>
-    <footer class="footer">
-      <div class="container">
-        <a href="https://github.com/jjbskir/angular-prerender" target="_block">Check out the project</a>
-      </div>
-    </footer>
+    <div id="navigator" ui-view></div>
     <script src="bower_components/lodash/lodash.min.js"></script>
     <script type="text/javascript"  src="bower_components/angular/angular.min.js"></script>
-    <script type="text/javascript"  src="bower_components/angular-route/angular-route.min.js"></script>
+    <script type="text/javascript"  src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
     <script type="text/javascript"  src="app.js"></script>
     <!-- prerender-scripts -->
 		<script type="text/javascript" src="angular-prerender/angular-prerender-routes.js"></script>

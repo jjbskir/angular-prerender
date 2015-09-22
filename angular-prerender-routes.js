@@ -108,7 +108,7 @@ angular.module('angularPrerenderRoutes', [])
 
     }
 
-    // angular router is completely extensible through these functions.
+    // angular router is completely extensible and agnostic through these functions.
     // can update the template and how to create it. 
     this.setRouteTemplate = setRouteTemplate;
     this.setRouteTemplateSingle = setRouteTemplateSingle;
@@ -120,6 +120,5 @@ angular.module('angularPrerenderRoutes', [])
         getUrlRoute: getUrlRoute,
       };
     };
-
 
 });
