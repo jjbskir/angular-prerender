@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible"  content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description"            content="Angular Prerender Example">
+    <meta name="author"                 content="jjbskir">
+    <title>Angular Prerender Example</title>
+    <!-- prerender-styles -->
+    <!-- prerender-style-end -->
+   
+  </head>
+  <body>
+    <h3>Angular Prerender Example</h3>
+    <h3>Using <a href="https://github.com/angular/router" target="_blank">angular router</a></h3>
+    <!-- Begin page content -->
+    <div class="container">
+      <section id="app-layout" class="index" ng-view></section>
+    </div>
+    <br>
+    <footer class="footer">
+      <div class="container">
+        <a href="https://github.com/jjbskir/angular-prerender" target="_block">Check out the project</a>
+      </div>
+    </footer>
+    <script src="bower_components/lodash/lodash.min.js"></script>
+    <script type="text/javascript"  src="bower_components/angular/angular.min.js"></script>
+    <script type="text/javascript"  src="bower_components/angular-route/angular-route.min.js"></script>
+    <script type="text/javascript"  src="app.js"></script>
+    <!-- prerender-scripts -->
+		<script type="text/javascript" src="angular-prerender/angular-prerender-routes.js"></script>
+		<script type="text/javascript" src="controllers/home.js"></script>
+		<script type="text/javascript" src="controllers/about.js"></script>
+		<script type="text/javascript">window.prerenderConfig={"template":"index.html","templateView":"views/home.html","templateController":"HomeCtrl","routes":[{"name":"index","title":"Index","descritpion":"Home","controller":"HomeCtrl","view":"views/home.html","scripts":["controllers/home.js"],"styles":[]},{"name":"about","title":"About","descritpion":"About","controller":"AboutCtrl","view":"views/about.html","scripts":["controllers/about.js"],"styles":[]}]}</script>
+    <!-- prerender-scripts-end -->
+    <script type="text/javascript">
+        // manual bootstrap
+        angular.element(document).ready(function() {
+          angular.bootstrap(document, ['app']);
+        });
+    </script>
+  </body>
+</html>

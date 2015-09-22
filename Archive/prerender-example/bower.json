@@ -1,0 +1,21 @@
+{
+  "name": "angular-prerender-example",
+  "version": "0.1.0",
+  "directory": "bower_components/",
+  "authors": [
+    "jjbskir@gmail.com"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "~3.10.1",
+    "angular": "~1.4.6",
+    "angular-route": "~1.4.6"
+  }
+}
