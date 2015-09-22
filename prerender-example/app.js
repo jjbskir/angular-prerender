@@ -3,7 +3,7 @@ angular.module('app', [
     'ui.router', 
     'angularPrerenderRoutes'
 ])
-.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function($stateProvider, $urlRouterProvider, $locationProvider) {
+.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 'angularPrerenderProvider', function($stateProvider, $urlRouterProvider, $locationProvider, angularPrerenderProvider) {
 
     // provide a wrapper controller and view that is gloabl.
     $stateProvider
@@ -18,10 +18,12 @@ angular.module('app', [
         }
     })
 
-}])
-.controller('MasterController', ['$rootScope', '$location', '$scope', '$state', 'angularPrerenderFactory', function($rootScope, $location, $scope , $state, angularPrerenderFactory) {
+    angularPrerenderProvider.createRoutes({$stateProvider: $stateProvider});
 
-    $scope.isHashRoute = angularPrerenderFactory.isHashRoute();
+}])
+.controller('MasterController', ['$rootScope', '$location', '$scope', '$state', 'angularPrerender', function($rootScope, $location, $scope , $state, angularPrerender) {
+
+    $scope.isHashRoute = angularPrerender.isHashRoute();
     console.log('using hash routes: ' + $scope.isHashRoute);
 
 }]);

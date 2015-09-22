@@ -1,5 +1,5 @@
 angular.module('angularPrerenderRoutes', [])
-.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+.provider('angularPrerender', function() {
 
     String.prototype.includes = function(str) {
         return (this.indexOf(str) > -1);
@@ -26,91 +26,100 @@ angular.module('angularPrerenderRoutes', [])
    		return urlRoute = paths[paths.length-1];
    	}
 
-   	if (!isHashRoute()) {
+    // the route template that gets created if using hashtag routing.
+    var routeTemplate = function(params, route) {
+      params.$stateProvider
+      .state('view.' + route.name, {
+        url: '/' + route.name,
+        views: {
+          'detail@view' : {
+            templateUrl: route.view,
+            controller: route.controller
+          }
+        }
+      })
+    }
 
-   		// create a solo route based on the current url.
-      	console.log('route solo');
+    // set the routeTemplate for hash tag routing.
+    // angularPrerenderProvider.setRouteTemplate(function($stateProvider, route) {
+    //   $stateProvider
+    //   .state('view.' + route.name, {
+    //     url: '/' + route.name,
+    //     views: {
+    //       'detail@view' : {
+    //         templateUrl: route.view,
+    //         controller: route.controller
+    //       }
+    //     }
+    //   })
+    // });
+    function setRouteTemplate(template) {
+      routeTemplate = template;
+    }
 
-      	var urlRoute = getUrlRoute();
-      	var route = _.find(window.prerenderConfig.routes, function(route) { return route.name === urlRoute; });
+    // the route template that gets created if not using hashtag routing.
+    // also is used to create the hashtag routes default path.
+    var routeTemplateSingle = function(params, route) {
+      params.$stateProvider
+      .state('view.home', {
+        url: '/',
+        views: {
+            'detail@view' : {
+                templateUrl: route.view,
+                controller: route.controller
+            }
+        }
+      })
+    }
 
-      	console.log(window.prerenderConfig);
-      	console.log(route);
+    // set the route template that gets created if not using hashtag routing.
+    function setRouteTemplateSingle(template) {
+      routeTemplateSingle = template;
+    }
 
-      	$stateProvider
-      	.state('view.home', {
-         	url: '/',
-         	views: {
-            	'detail@view' : {
-               		templateUrl: route.view,
-               		controller: route.controller
-            	}
-         	}
-      	})
+    // create the routes.
+    // params: dyanmic object. Used to pass in the $stateProvider and any other objects needed to create the templates.
+    function createRoutes(params) {
+      params = params || {};
+      if (!isHashRoute()) {
 
-   	} else {
+        // create a solo route based on the current url.
+        // console.log('route solo');
 
-   		// create all of the routes.
-      console.log('route all');
+        var urlRoute = getUrlRoute();
+        var route = _.find(window.prerenderConfig.routes, function(route) { return route.name === urlRoute; });
 
-      	$stateProvider
-      	.state('view.home', {
-        	url: '/',
-         	views: {
-            	'detail@view' : {
-               		templateUrl: window.prerenderConfig.templateView,
-               		controller: window.prerenderConfig.templateController
-           	 	}
-         	}
-      	})
+        // console.log(window.prerenderConfig);
+        // console.log(route);
 
-      	_.each(window.prerenderConfig.routes, function(route) {
-         	$stateProvider
-         	.state('view.' + route.name, {
-            	url: '/' + route.name,
-            	views: {
-               		'detail@view' : {
-                  		templateUrl: route.view,
-                  		controller: route.controller
-               		}
-            	}	
-         	})
-      	})
-   	}
+        routeTemplateSingle(params, route);
 
-	// this is required for the root url to direct to /#/
-	$urlRouterProvider.otherwise('/');
-	// $locationProvider.html5Mode(true);
+      } else {
 
-}])
+        // create all of the routes.
+        // console.log('route all');
 
-.factory('angularPrerenderFactory', function() {
+        routeTemplateSingle(params, {view: window.prerenderConfig.templateView, controller: window.prerenderConfig.templateController});
 
-    // check if the app is using hash routes to determine view.
-    // return true if using hash routes, false otherwise
-   	function isHashRoute() {
-   		var endPath = getUrlRoute();
-   		// console.log(endPath);
-   		// console.log(window.location.hash);
-   		// if we are on the index page, then use hash routes.
-   		if (endPath === 'index.html') return true;
-   		// if the has is '#/' then it is probably a non-hash route. 
-   		// if the pathname ends does ends in '', then should be non-hash route.
-   		return !((window.location.hash === '#/' || window.location.hash === '') && endPath !== '');
-   	}
+        _.each(window.prerenderConfig.routes, function(route) {
+          routeTemplate(params, route);
+        })
+      }
 
-   	// get the route from the url.
-   	// window.location.pathname -> /postcollegeguide/about
-   	// return: about
-   	function getUrlRoute() {
-   		var paths = window.location.pathname.split('/');
-   		return urlRoute = paths[paths.length-1];
-   	}
+    }
 
-  	return {
-  		isHashRoute: isHashRoute,
-  		getUrlRoute: getUrlRoute
-  	};
+    // angular router is completely extensible through these functions.
+    // can update the template and how to create it. 
+    this.setRouteTemplate = setRouteTemplate;
+    this.setRouteTemplateSingle = setRouteTemplateSingle;
+    this.createRoutes = createRoutes;
+
+    this.$get = function() {
+      return {
+        isHashRoute: isHashRoute,
+        getUrlRoute: getUrlRoute,
+      };
+    };
+
 
 });
-

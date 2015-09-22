@@ -9,8 +9,11 @@ Prerender your angular project to improve SEO and make pretty links.
 ```
 $ git clone https://github.com/jjbskir/angular-prerender
 ```
-- Change to angular-prerender directory
-- Run 'npm install'
+- Change to angular-prerender directory and install.
+```
+$ cd angular-prerender
+$ npm install
+```
 
 ## Setup:
 - In your main directory create a file named prerender-config.json
