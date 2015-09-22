@@ -33,7 +33,7 @@ angular.module('app', [
     });
     angularPrerenderProvider.setRouteTemplateSingle(function(params, route) {
         params.$stateProvider
-        .state('view.home', {
+        .state('view.index', {
             url: '/',
             views: {
                 'detail@view' : {

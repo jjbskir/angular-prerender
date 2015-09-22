@@ -61,7 +61,7 @@ angular.module('angularPrerenderRoutes', [])
     // also is used to create the hashtag routes default path.
     var routeTemplateSingle = function(params, route) {
       params.$stateProvider
-      .state('view.home', {
+      .state('view.index', {
         url: '/',
         views: {
             'detail@view' : {

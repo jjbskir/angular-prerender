@@ -4,6 +4,9 @@
 Prerender your angular project to improve SEO and make pretty links. 
 - Created so that a angular app can have pretty Urls and hosted on AWS s3. 
 
+## Example:
+- http://jjbskir.github.io/angular-prerender
+
 ## Install: 
 - Clone repository
 ```

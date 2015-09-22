@@ -202,7 +202,7 @@ function readFile(route, routes, template) {
 	rl.on('close', function () {
 	  	console.log('done processing: ' + route.name);
 	  	// console.log(prerenderedHTML);
-	  	writeRenderer(route.name, prerenderedHTML);
+	  	writeRenderer(route.name+'.html', prerenderedHTML);
 	});
 
 	function addAsset(searchFor, line, route) {

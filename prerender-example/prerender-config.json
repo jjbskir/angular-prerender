@@ -4,8 +4,8 @@
 	"templateController": "HomeCtrl",
 	"routes": [
 		{
-		  "name": "index",
-		  "title": "Index",
+		  "name": "home",
+		  "title": "Home",
 		  "descritpion": "Home",
 		  "controller": "HomeCtrl",
 		  "view": "views/home.html",
