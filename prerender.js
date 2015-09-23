@@ -78,6 +78,8 @@ function validateConfig(config) {
 
 // update the template file with the config variables. 
 function updateTemplate(template, routes, cb) {
+	var loadedScripts = {};
+	var loadedStyles = {};
 	var prerenderedHTML = '';
 	var scripts = false;
 	var prerenderScriptMarker = '';
@@ -97,7 +99,7 @@ function updateTemplate(template, routes, cb) {
 			scripts = false;
 			newLine += prerenderScriptMarker + '\n' + addScript(angularPrerenderRoutesFile) + '\n';
 			_.each(routes, function(route) {
-				newLine += addRouteScripts(route.scripts);
+				newLine += addRouteScripts(route.scripts, loadedScripts);
 			})
 			newLine += addConfig() + '\n' + line;
 		} else if (line.includes("prerender-style") && !line.includes("prerender-style-end")) {
@@ -107,7 +109,7 @@ function updateTemplate(template, routes, cb) {
 			styles = false;
 			newLine += prerenderStyleMarker + '\n';
 			_.each(routes, function(route) {
-				newLine += addRouteStyles(route.styles);
+				newLine += addRouteStyles(route.style, loadedStyles);
 			})
 			newLine += line;
 		} else {
@@ -239,10 +241,16 @@ function addScript(script) {
 }
 
 // add all of the scripts for a route.
-function addRouteScripts(scripts) {
+function addRouteScripts(scripts, loadedScripts) {
+	loadedScripts = loadedScripts || {};
 	var line = '';
 	_.each(scripts, function(script) {
-		line += addScript(script) + '\n';
+		// only add the script if it has not been added yet.
+		if (!_.has(loadedScripts, script)) {
+			// if we have not added this script in yet.
+			line += addScript(script) + '\n';
+			loadedScripts[script] = true;
+		}
 	});
 	return line;
 }
@@ -255,10 +263,14 @@ function addStyle(style) {
 }
 
 // add all of the scripts for a route.
-function addRouteStyles(styles) {
+function addRouteStyles(styles, loadedStyles) {
+	loadedStyles = loadedStyles || {};
 	var line = '';
 	_.each(styles, function(style) {
-		line += addStyle(style) + '\n';
+		if (!_.has(loadedStyles, style)) {
+			line += addStyle(style) + '\n';
+			loadedStyles[style] = true;
+		}
 	});
 	return line;
 }
