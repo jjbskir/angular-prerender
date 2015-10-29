@@ -16,6 +16,7 @@ var angularPrerenderRoutesFile = 'angular-prerender/angular-prerender-routes.js'
 var config = {};
 var template = '';
 var routes = [];
+var tab = '\t\t';
 
 init();
 
@@ -168,15 +169,22 @@ function readFile(route, routes, template) {
 		} else if (line.includes('name="description"') || line.includes("name='description'")) {
 			// change the description of the page.
 			// <meta name="description" content="Project">
-			newLine = (route.description) ? '\t\t<meta name="description" content="' + route.description + '">' : line;
+			newLine = (route.description) ? tab + '<meta name="description" content="' + route.description + '">' : line;
 		} else if (line.includes('name="author"') || line.includes("name='author'")) {
 			// change the author of the page.
 			// <meta name="author" content="jjbskir">
-			newLine = (route.author) ? '\t\t<meta name="author" content="' + route.author + '">' : line;
+			newLine = (route.author) ? tab + '<meta name="author" content="' + route.author + '">' : line;
+		} else if (line.includes('name="keyphrases"')) {
+			// change the title of the page.
+			// <keyphrases>Project</keyphrases>
+			newLine = (route.keyphrases) ? tab + '<meta name="keyphrases" content="' + route.keyphrases + '">' : line;
 		} else if (line.includes("<title>")) {
 			// change the title of the page.
 			// <title>Project</title>
-			newLine = (route.title) ? '\t\t<title>' + route.title + '</title>' : line;
+			newLine = (route.title) ? tab + '<title>' + route.title + '</title>' : line;
+		} else if (line.includes('ng-view') || line.includes('ui-view')) {
+			console.log(line);
+			newLine = addView(line, route);
 		} else {
 			newLine = line;
 			// if (scripts) {
@@ -230,14 +238,14 @@ function readFile(route, routes, template) {
 // Add config variable to the page.
 // return: Html to add to the page. <script type="text/javascript">window.prerenderConfig={}</script>
 function addConfig() {
-	return '\t\t<script type="text/javascript">window.prerenderConfig=' + JSON.stringify(config) + '</script>';
+	return tab + '<script type="text/javascript">window.prerenderConfig=' + JSON.stringify(config) + '</script>';
 }
 
 // Add a script to the page.
 // script: Script path. app/js/test.js
 // return: Html to add to the page. <script type="text/javascript" src="app/js/test.js"></script>
 function addScript(script) {
-	return '\t\t<script type="text/javascript" src="' + script + '"></script>';
+	return tab + '<script type="text/javascript" src="' + script + '"></script>';
 }
 
 // add all of the scripts for a route.
@@ -259,7 +267,7 @@ function addRouteScripts(scripts, loadedScripts) {
 // style: Style path. app/css/test.css
 // return: Html to add to the page. <link rel="stylesheet" type="text/css" href="app/css/test.css"/>
 function addStyle(style) {
-	return '\t\t<link rel="stylesheet" type="text/css" href="' + style + '"/>';
+	return tab + '<link rel="stylesheet" type="text/css" href="' + style + '"/>';
 }
 
 // add all of the scripts for a route.
@@ -273,6 +281,42 @@ function addRouteStyles(styles, loadedStyles) {
 		}
 	});
 	return line;
+}
+
+// add the html of the view to the page.
+// <section id="app-layout" class="index" ng-view></section>
+// <section id="app-layout" class="index" ng-controller="HomeCtrl"></section>
+function addView(line, route) {
+	var searches = ['ng-view', 'ui-view'];
+	for (var i = 0; i < searches.length; i++) {
+		var search = searches[i];
+		// if we found the angular rout to search for. 
+		if (line.includes(search)) break;
+	}
+	var newController = 'ng-controller="' + route.controller + '"';
+	// remove closing tag. Add in later.
+	var closeTag = findClosingTag(line);
+	line = line.replace(closeTag, '');
+	line = line.replace(search, newController);
+	// load the view and add it to the html
+	line += '\n' + tab +  readViewFile(route.view);
+	// add the closing tag back in.
+	line += '\n' + tab + closeTag;
+	return line;
+}
+
+// read the html in a file.
+function readViewFile(file) {
+	var buf = fs.readFileSync(file, "utf8");
+	return buf;
+}
+
+// find a closing HTML tag.
+// <section id="app-layout" class="index" ng-view></section>
+// return: </section>;
+function findClosingTag(line) {
+	var start = line.indexOf('</');
+	return line.substring(start);
 }
 
 function writeRenderer(routeName, prerenderedHTML, cb) {
